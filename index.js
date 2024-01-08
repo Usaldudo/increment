@@ -30,25 +30,28 @@ function input(name, def) {
 
 function increment(string, amount) {
   // Extract string's numbers
-  var numbers = string.match(/\d+/g) || [];
+  var matches = string.match(/(-?)(\d+)/g) || [];
 
   // Increment the last number by the amount
-  var lastNumberIndex = numbers.length - 1;
-  var lastNumber = parseInt(numbers[lastNumberIndex], 10) || 0;
-  numbers[lastNumberIndex] = (lastNumber + parseInt(amount, 10)).toString();
+  var lastMatchIndex = matches.length - 1;
+  var lastMatch = matches[lastMatchIndex];
+  var sign = lastMatch.startsWith("-") ? "-" : "";
+  var lastNumber = parseInt(lastMatch.replace("-", ""), 10) || 0;
+  matches[lastMatchIndex] = (lastNumber + parseInt(amount, 10)).toString();
 
   // Reconstruct the string with incremented numbers and leading zeroes
-  var result = string.replace(/\d+/g, function(match) {
-    var currentNumber = numbers.shift();
-    if (match.startsWith("0")) {
-      while (currentNumber.length < match.length) {
+  var result = string.replace(/(-?)(\d+)/g, function (match) {
+    var matchWithoutSign = match.replace("-", "")
+    var currentNumber = matches.shift();
+    if (matchWithoutSign.startsWith("0")) {
+      while (currentNumber.length < matchWithoutSign.length) {
         currentNumber = "0" + currentNumber;
       }
     }
     return currentNumber;
   });
 
-  return result;
+  return sign + result;
 }
 
 const createVariable = (data) => {
